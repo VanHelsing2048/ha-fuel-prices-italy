@@ -1,0 +1,48 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Fuel Prices Italy",
+        "description": "Configure a search area for Italian fuel station prices from MIMIT Osservaprezzi.",
+        "data": {
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "radius_km": "Search radius",
+          "fuel_types": "Fuel types",
+          "show_self": "Show self-service prices",
+          "show_serviced": "Show serviced prices",
+          "scan_interval": "Update interval",
+          "max_stations": "Maximum stations"
+        }
+      }
+    },
+    "error": {
+      "select_at_least_one_mode": "Select at least one price mode: self-service or serviced."
+    },
+    "abort": {
+      "already_configured": "This search point is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Fuel Prices Italy options",
+        "description": "Update the search area, fuel filters and polling interval.",
+        "data": {
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "radius_km": "Search radius",
+          "fuel_types": "Fuel types",
+          "show_self": "Show self-service prices",
+          "show_serviced": "Show serviced prices",
+          "scan_interval": "Update interval",
+          "max_stations": "Maximum stations"
+        }
+      }
+    },
+    "error": {
+      "select_at_least_one_mode": "Select at least one price mode: self-service or serviced."
+    }
+  }
+}
+

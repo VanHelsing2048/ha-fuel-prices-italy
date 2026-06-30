@@ -1,0 +1,48 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Fuel Prices Italy",
+        "description": "Configura un'area di ricerca per i prezzi dei distributori italiani tramite MIMIT Osservaprezzi.",
+        "data": {
+          "latitude": "Latitudine",
+          "longitude": "Longitudine",
+          "radius_km": "Raggio di ricerca",
+          "fuel_types": "Carburanti",
+          "show_self": "Mostra prezzi self-service",
+          "show_serviced": "Mostra prezzi servito",
+          "scan_interval": "Intervallo aggiornamento",
+          "max_stations": "Numero massimo distributori"
+        }
+      }
+    },
+    "error": {
+      "select_at_least_one_mode": "Seleziona almeno una modalita prezzo: self-service o servito."
+    },
+    "abort": {
+      "already_configured": "Questo punto di ricerca e gia configurato."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opzioni Fuel Prices Italy",
+        "description": "Modifica area di ricerca, filtri carburante e intervallo di aggiornamento.",
+        "data": {
+          "latitude": "Latitudine",
+          "longitude": "Longitudine",
+          "radius_km": "Raggio di ricerca",
+          "fuel_types": "Carburanti",
+          "show_self": "Mostra prezzi self-service",
+          "show_serviced": "Mostra prezzi servito",
+          "scan_interval": "Intervallo aggiornamento",
+          "max_stations": "Numero massimo distributori"
+        }
+      }
+    },
+    "error": {
+      "select_at_least_one_mode": "Seleziona almeno una modalita prezzo: self-service o servito."
+    }
+  }
+}
+

@@ -1,0 +1,13 @@
+{
+  "domain": "fuel_prices_italy",
+  "name": "Fuel Prices Italy",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/VanHelsing2048/ha-fuel-prices-italy",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/VanHelsing2048/ha-fuel-prices-italy/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}
