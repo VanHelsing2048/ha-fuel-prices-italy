@@ -4,6 +4,12 @@ All notable changes to this project are documented in this file.
 
 This project follows semantic versioning once published with GitHub releases.
 
+## 0.1.1 - 2026-07-02
+
+### Fixed
+
+- Simplified `hacs.json` to use only keys supported by the current HACS manifest specification.
+
 ## 0.1.0 - 2026-06-30
 
 ### Added
@@ -15,4 +21,3 @@ This project follows semantic versioning once published with GitHub releases.
 - Station count and nearest-station sensors.
 - Geo-location entities for fuel station markers on Home Assistant maps.
 - HACS metadata, README and project icon assets.
-
