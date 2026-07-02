@@ -7,11 +7,11 @@ from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .api import Station
+from .api import FuelPrice, Station
 from .const import (
     ATTR_BRAND,
     ATTR_DISTANCE_KM,
@@ -64,6 +64,31 @@ async def async_setup_entry(
             FuelRecommendedStationSensor(coordinator, entry),
         ]
     )
+    known_price_sensors: set[tuple[int, int, bool]] = set()
+
+    @callback
+    def add_station_price_sensors() -> None:
+        entities = []
+        for station in (coordinator.data or {}).values():
+            for fuel in coordinator.visible_fuels(station):
+                sensor_key = (station.id, fuel.fuel_id, fuel.is_self)
+                if sensor_key in known_price_sensors:
+                    continue
+                known_price_sensors.add(sensor_key)
+                entities.append(
+                    FuelStationPriceSensor(
+                        coordinator,
+                        entry,
+                        station.id,
+                        fuel.fuel_id,
+                        fuel.is_self,
+                    )
+                )
+        if entities:
+            async_add_entities(entities)
+
+    add_station_price_sensors()
+    entry.async_on_unload(coordinator.async_add_listener(add_station_price_sensors))
 
 
 class FuelPricesItalySensorEntity(CoordinatorEntity[FuelPricesItalyCoordinator], SensorEntity):
@@ -226,6 +251,76 @@ class FuelRecommendedStationSensor(FuelPricesItalySensorEntity):
                 if best is None or score < best[2]:
                     best = (station, fuel, score)
         return best
+
+
+class FuelStationPriceSensor(FuelPricesItalySensorEntity):
+    """Price sensor for one station/fuel/service-mode tuple."""
+
+    _attr_native_unit_of_measurement = "EUR/L"
+    _attr_suggested_display_precision = 3
+    _attr_icon = "mdi:gas-station"
+
+    def __init__(
+        self,
+        coordinator: FuelPricesItalyCoordinator,
+        entry: ConfigEntry,
+        station_id: int,
+        fuel_id: int,
+        is_self: bool,
+    ) -> None:
+        """Initialize the entity."""
+        super().__init__(coordinator, entry)
+        self._station_id = station_id
+        self._fuel_id = fuel_id
+        self._is_self = is_self
+        mode = "self" if is_self else "servito"
+        fuel_name = FUEL_TYPES.get(fuel_id, f"Carburante {fuel_id}")
+        self._attr_unique_id = (
+            f"{entry.entry_id}_station_{station_id}_{fuel_id}_{mode}_price"
+        )
+        station = self._station
+        station_name = station.display_name if station else f"Distributore {station_id}"
+        self._attr_name = f"{station_name} {fuel_name} {mode}"
+
+    @property
+    def available(self) -> bool:
+        """Return whether the price exists in the latest data."""
+        return super().available and self._fuel is not None
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the latest fuel price."""
+        fuel = self._fuel
+        return round(fuel.price, 3) if fuel else None
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return station and fuel details."""
+        station = self._station
+        fuel = self._fuel
+        if station is None or fuel is None:
+            return {}
+        return _station_attrs(station) | {
+            "fuel_id": fuel.fuel_id,
+            "fuel_name": fuel.name,
+            "is_self": fuel.is_self,
+            "price_eur_l": round(fuel.price, 3),
+            "price_display": f"{fuel.price:.3f} EUR/L",
+        }
+
+    @property
+    def _station(self) -> Station | None:
+        return (self.coordinator.data or {}).get(self._station_id)
+
+    @property
+    def _fuel(self) -> FuelPrice | None:
+        station = self._station
+        if station is None:
+            return None
+        for fuel in self.coordinator.visible_fuels(station):
+            if fuel.fuel_id == self._fuel_id and fuel.is_self == self._is_self:
+                return fuel
+        return None
 
 
 def _station_attrs(station: Station) -> dict[str, Any]:

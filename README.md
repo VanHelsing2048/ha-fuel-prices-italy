@@ -118,6 +118,13 @@ The integration creates best-price sensors such as:
 - `sensor.fuel_prices_italy_distributore_piu_vicino`
 - `sensor.fuel_prices_italy_distributore_consigliato`
 
+It also creates per-station price sensors for each visible station/fuel/service-mode pair. These sensors have a numeric `EUR/L` state and can be used in history graphs, statistics cards and automations.
+
+Examples:
+
+- `sensor.x_oil_benzina_self`
+- `sensor.distributore_carburanti_tap_benzina_self`
+
 Best-price sensors expose useful attributes:
 
 - station id
@@ -148,6 +155,8 @@ Each station is exposed as a `geo_location` entity with:
 - MIMIT update timestamp
 
 These entities can appear in Home Assistant map views and Map cards.
+
+Home Assistant uses the state of `geo_location` entities as distance. For price history and monitoring, use the per-station price sensors instead of the map marker state.
 
 Example Map card:
 

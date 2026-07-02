@@ -4,6 +4,12 @@ All notable changes to this project are documented in this file.
 
 This project follows semantic versioning once published with GitHub releases.
 
+## 0.1.5 - 2026-07-02
+
+### Added
+
+- Added per-station fuel price sensors with numeric `EUR/L` states so individual station prices can be graphed and monitored over time.
+
 ## 0.1.4 - 2026-07-02
 
 ### Changed
