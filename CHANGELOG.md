@@ -4,6 +4,12 @@ All notable changes to this project are documented in this file.
 
 This project follows semantic versioning once published with GitHub releases.
 
+## 0.1.4 - 2026-07-02
+
+### Changed
+
+- Station map marker names now include the best visible fuel price to avoid confusing the `geo_location` distance state with a fuel price.
+
 ## 0.1.3 - 2026-07-02
 
 ### Added
