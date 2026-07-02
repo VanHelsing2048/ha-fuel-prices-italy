@@ -101,13 +101,14 @@ class OptionsFlow(config_entries.OptionsFlow):
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
-        self.config_entry = config_entry
+        self._config_entry_fallback = config_entry
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
         """Manage integration options."""
-        defaults = {**self.config_entry.data, **self.config_entry.options}
+        config_entry = getattr(self, "config_entry", self._config_entry_fallback)
+        defaults = {**config_entry.data, **config_entry.options}
         if user_input is not None:
             if not user_input[CONF_SHOW_SELF] and not user_input[CONF_SHOW_SERVICED]:
                 return self.async_show_form(

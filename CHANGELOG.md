@@ -4,6 +4,12 @@ All notable changes to this project are documented in this file.
 
 This project follows semantic versioning once published with GitHub releases.
 
+## 0.1.7 - 2026-07-02
+
+### Fixed
+
+- Fixed the options flow on Home Assistant versions where `config_entry` is managed by the framework and cannot be assigned in the options flow constructor.
+
 ## 0.1.6 - 2026-07-02
 
 ### Added
