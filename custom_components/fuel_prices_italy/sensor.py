@@ -13,8 +13,10 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .api import FuelPrice, Station
 from .const import (
+    ATTR_ADDRESS,
     ATTR_BRAND,
     ATTR_DISTANCE_KM,
+    ATTR_DISTANCE_UNIT,
     ATTR_INSERT_DATE,
     ATTR_STATION_ID,
     ATTR_STATION_NAME,
@@ -149,6 +151,7 @@ class FuelBestPriceSensor(FuelPricesItalySensorEntity):
             "is_self": fuel.is_self,
             "price_eur_l": round(fuel.price, 3),
             "price_display": f"{fuel.price:.3f} EUR/L",
+            "last_update": station.insert_date,
         }
 
 
@@ -231,6 +234,7 @@ class FuelRecommendedStationSensor(FuelPricesItalySensorEntity):
             "is_self": fuel.is_self,
             "price_eur_l": round(fuel.price, 3),
             "price_display": f"{fuel.price:.3f} EUR/L",
+            "last_update": station.insert_date,
             "convenience_score": round(score, 3),
             "score_formula": "price_eur_l + distance_km * 0.03",
         }
@@ -306,6 +310,7 @@ class FuelStationPriceSensor(FuelPricesItalySensorEntity):
             "is_self": fuel.is_self,
             "price_eur_l": round(fuel.price, 3),
             "price_display": f"{fuel.price:.3f} EUR/L",
+            "last_update": station.insert_date,
         }
 
     @property
@@ -328,6 +333,8 @@ def _station_attrs(station: Station) -> dict[str, Any]:
         ATTR_STATION_ID: station.id,
         ATTR_STATION_NAME: station.display_name,
         ATTR_BRAND: station.brand,
+        ATTR_ADDRESS: station.address,
         ATTR_DISTANCE_KM: round(station.distance_km, 3),
+        ATTR_DISTANCE_UNIT: "km",
         ATTR_INSERT_DATE: station.insert_date,
     }

@@ -60,6 +60,7 @@ class Station:
     id: int
     name: str
     brand: str | None
+    address: str | None
     latitude: float
     longitude: float
     distance_km: float
@@ -83,6 +84,7 @@ class Station:
             id=int(data["id"]),
             name=str(data.get("name") or data["id"]),
             brand=data.get("brand"),
+            address=data.get("address"),
             latitude=float(location["lat"]),
             longitude=float(location["lng"]),
             distance_km=float(data.get("distance", 0)),
@@ -96,6 +98,7 @@ class Station:
             "id": self.id,
             "name": self.display_name,
             "brand": self.brand,
+            "address": self.address,
             "latitude": self.latitude,
             "longitude": self.longitude,
             "distance_km": round(self.distance_km, 3),

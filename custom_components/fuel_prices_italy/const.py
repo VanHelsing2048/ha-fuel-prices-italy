@@ -23,7 +23,9 @@ CONF_SCAN_INTERVAL = "scan_interval"
 CONF_MAX_STATIONS = "max_stations"
 
 ATTR_BRAND = "brand"
+ATTR_ADDRESS = "address"
 ATTR_DISTANCE_KM = "distance_km"
+ATTR_DISTANCE_UNIT = "distance_unit"
 ATTR_FUELS = "fuels"
 ATTR_INSERT_DATE = "insert_date"
 ATTR_STATION_ID = "station_id"
@@ -46,4 +48,3 @@ FUEL_TYPES: dict[int, str] = {
 
 FUEL_SELECT_OPTIONS = {str(fuel_id): name for fuel_id, name in FUEL_TYPES.items()}
 DEFAULT_FUEL_TYPES = ["1", "2"]
-

@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 
 This project follows semantic versioning once published with GitHub releases.
 
+## 0.1.6 - 2026-07-02
+
+### Added
+
+- Added explicit `km` unit metadata/attributes to station distances.
+- Added station address attributes when MIMIT provides them.
+- Added clearer recommended-station attributes for address, distance, price and last update.
+
 ## 0.1.5 - 2026-07-02
 
 ### Added

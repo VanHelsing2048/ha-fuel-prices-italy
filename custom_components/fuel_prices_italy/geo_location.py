@@ -11,7 +11,15 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .api import Station
-from .const import ATTR_BRAND, ATTR_DISTANCE_KM, ATTR_FUELS, ATTR_INSERT_DATE, DOMAIN
+from .const import (
+    ATTR_ADDRESS,
+    ATTR_BRAND,
+    ATTR_DISTANCE_KM,
+    ATTR_DISTANCE_UNIT,
+    ATTR_FUELS,
+    ATTR_INSERT_DATE,
+    DOMAIN,
+)
 from .coordinator import FuelPricesItalyCoordinator
 
 
@@ -46,6 +54,7 @@ class FuelStationGeoLocation(
 
     _attr_icon = "mdi:gas-station"
     _attr_source = "fuel_prices_italy"
+    _attr_unit_of_measurement = "km"
 
     def __init__(
         self,
@@ -99,7 +108,9 @@ class FuelStationGeoLocation(
         return {
             "station_name": station.display_name,
             ATTR_BRAND: station.brand,
+            ATTR_ADDRESS: station.address,
             ATTR_DISTANCE_KM: round(station.distance_km, 3),
+            ATTR_DISTANCE_UNIT: "km",
             ATTR_INSERT_DATE: station.insert_date,
             "best_price_eur_l": round(best_fuel.price, 3) if best_fuel else None,
             "best_price_display": f"{best_fuel.price:.3f} EUR/L" if best_fuel else None,
