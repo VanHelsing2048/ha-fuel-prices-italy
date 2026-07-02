@@ -4,6 +4,12 @@ All notable changes to this project are documented in this file.
 
 This project follows semantic versioning once published with GitHub releases.
 
+## 0.1.2 - 2026-07-02
+
+### Fixed
+
+- Replaced modern selector classes in the config flow with stable Home Assistant config validation helpers to avoid `400: Bad Request` when opening the integration setup flow.
+
 ## 0.1.1 - 2026-07-02
 
 ### Fixed

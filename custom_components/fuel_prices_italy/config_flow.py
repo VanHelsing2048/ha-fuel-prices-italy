@@ -8,15 +8,7 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.core import callback
-from homeassistant.helpers.selector import (
-    BooleanSelector,
-    NumberSelector,
-    NumberSelectorConfig,
-    NumberSelectorMode,
-    SelectSelector,
-    SelectSelectorConfig,
-    SelectSelectorMode,
-)
+import homeassistant.helpers.config_validation as cv
 
 from .const import (
     CONF_FUEL_TYPES,
@@ -39,39 +31,33 @@ def _schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
     defaults = defaults or {}
     return vol.Schema(
         {
-            vol.Required(CONF_LATITUDE, default=defaults.get(CONF_LATITUDE, 45.644912)): NumberSelector(
-                NumberSelectorConfig(min=-90, max=90, step=0.000001, mode=NumberSelectorMode.BOX)
+            vol.Required(
+                CONF_LATITUDE, default=defaults.get(CONF_LATITUDE, 45.644912)
+            ): vol.All(vol.Coerce(float), vol.Range(min=-90, max=90)),
+            vol.Required(
+                CONF_LONGITUDE, default=defaults.get(CONF_LONGITUDE, 12.330887)
+            ): vol.All(vol.Coerce(float), vol.Range(min=-180, max=180)),
+            vol.Required(
+                CONF_RADIUS_KM, default=defaults.get(CONF_RADIUS_KM, DEFAULT_RADIUS_KM)
+            ): vol.All(vol.Coerce(float), vol.Range(min=1, max=50)),
+            vol.Required(
+                CONF_FUEL_TYPES,
+                default=defaults.get(CONF_FUEL_TYPES, DEFAULT_FUEL_TYPES),
+            ): cv.multi_select(FUEL_SELECT_OPTIONS),
+            vol.Required(
+                CONF_SHOW_SELF, default=defaults.get(CONF_SHOW_SELF, True)
+            ): bool,
+            vol.Required(
+                CONF_SHOW_SERVICED, default=defaults.get(CONF_SHOW_SERVICED, False)
+            ): bool,
+            vol.Required(
+                CONF_SCAN_INTERVAL, default=defaults.get(CONF_SCAN_INTERVAL, 60)
+            ): vol.All(
+                vol.Coerce(int), vol.Range(min=MIN_SCAN_INTERVAL_MINUTES, max=1440)
             ),
-            vol.Required(CONF_LONGITUDE, default=defaults.get(CONF_LONGITUDE, 12.330887)): NumberSelector(
-                NumberSelectorConfig(min=-180, max=180, step=0.000001, mode=NumberSelectorMode.BOX)
-            ),
-            vol.Required(CONF_RADIUS_KM, default=defaults.get(CONF_RADIUS_KM, DEFAULT_RADIUS_KM)): NumberSelector(
-                NumberSelectorConfig(min=1, max=50, step=0.5, mode=NumberSelectorMode.SLIDER, unit_of_measurement="km")
-            ),
-            vol.Required(CONF_FUEL_TYPES, default=defaults.get(CONF_FUEL_TYPES, DEFAULT_FUEL_TYPES)): SelectSelector(
-                SelectSelectorConfig(
-                    options=[
-                        {"value": fuel_id, "label": label}
-                        for fuel_id, label in FUEL_SELECT_OPTIONS.items()
-                    ],
-                    multiple=True,
-                    mode=SelectSelectorMode.DROPDOWN,
-                )
-            ),
-            vol.Required(CONF_SHOW_SELF, default=defaults.get(CONF_SHOW_SELF, True)): BooleanSelector(),
-            vol.Required(CONF_SHOW_SERVICED, default=defaults.get(CONF_SHOW_SERVICED, False)): BooleanSelector(),
-            vol.Required(CONF_SCAN_INTERVAL, default=defaults.get(CONF_SCAN_INTERVAL, 60)): NumberSelector(
-                NumberSelectorConfig(
-                    min=MIN_SCAN_INTERVAL_MINUTES,
-                    max=1440,
-                    step=15,
-                    mode=NumberSelectorMode.BOX,
-                    unit_of_measurement="min",
-                )
-            ),
-            vol.Required(CONF_MAX_STATIONS, default=defaults.get(CONF_MAX_STATIONS, MAX_STATIONS)): NumberSelector(
-                NumberSelectorConfig(min=1, max=100, step=1, mode=NumberSelectorMode.BOX)
-            ),
+            vol.Required(
+                CONF_MAX_STATIONS, default=defaults.get(CONF_MAX_STATIONS, MAX_STATIONS)
+            ): vol.All(vol.Coerce(int), vol.Range(min=1, max=100)),
         }
     )
 
@@ -132,4 +118,3 @@ class OptionsFlow(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=user_input)
 
         return self.async_show_form(step_id="init", data_schema=_schema(defaults))
-
