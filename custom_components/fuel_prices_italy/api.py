@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 from typing import Any
 
 from aiohttp import ClientError, ClientSession
@@ -46,7 +47,8 @@ class FuelPrice:
             "id": self.id,
             "fuel_id": self.fuel_id,
             "name": self.name,
-            "price": self.price,
+            "price": round(self.price, 3),
+            "price_display": f"{self.price:.3f} EUR/L",
             "is_self": self.is_self,
         }
 
@@ -63,6 +65,15 @@ class Station:
     distance_km: float
     insert_date: str | None
     fuels: list[FuelPrice]
+
+    @property
+    def display_name(self) -> str:
+        """Return a friendly station name."""
+        if self.name and not re.fullmatch(r"\d+", self.name.strip()):
+            return self.name
+        if self.brand:
+            return f"{self.brand} {self.id}"
+        return f"Distributore {self.id}"
 
     @classmethod
     def from_api(cls, data: dict[str, Any]) -> "Station":
@@ -83,11 +94,11 @@ class Station:
         """Return a JSON-serializable representation."""
         return {
             "id": self.id,
-            "name": self.name,
+            "name": self.display_name,
             "brand": self.brand,
             "latitude": self.latitude,
             "longitude": self.longitude,
-            "distance_km": self.distance_km,
+            "distance_km": round(self.distance_km, 3),
             "insert_date": self.insert_date,
             "fuels": [fuel.as_dict() for fuel in self.fuels],
         }
@@ -132,4 +143,3 @@ class FuelPricesItalyClient:
             raise FuelPricesItalyApiError("Osservaprezzi returned an unsuccessful response")
 
         return [Station.from_api(station) for station in data.get("results", [])]
-

@@ -61,6 +61,7 @@ async def async_setup_entry(
         + [
             FuelStationCountSensor(coordinator, entry),
             FuelNearestStationSensor(coordinator, entry),
+            FuelRecommendedStationSensor(coordinator, entry),
         ]
     )
 
@@ -106,7 +107,7 @@ class FuelBestPriceSensor(FuelPricesItalySensorEntity):
         best = self.coordinator.best_price(
             self.entity_description.fuel_id, self.entity_description.is_self
         )
-        return best[1].price if best else None
+        return round(best[1].price, 3) if best else None
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -121,6 +122,8 @@ class FuelBestPriceSensor(FuelPricesItalySensorEntity):
             "fuel_id": fuel.fuel_id,
             "fuel_name": fuel.name,
             "is_self": fuel.is_self,
+            "price_eur_l": round(fuel.price, 3),
+            "price_display": f"{fuel.price:.3f} EUR/L",
         }
 
 
@@ -156,7 +159,7 @@ class FuelNearestStationSensor(FuelPricesItalySensorEntity):
     def native_value(self) -> str | None:
         """Return the nearest station name."""
         station = self._nearest_station
-        return station.name if station else None
+        return station.display_name if station else None
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -172,10 +175,63 @@ class FuelNearestStationSensor(FuelPricesItalySensorEntity):
         return min(stations, key=lambda station: station.distance_km)
 
 
+class FuelRecommendedStationSensor(FuelPricesItalySensorEntity):
+    """Recommended station balancing price and distance."""
+
+    _attr_name = "Distributore consigliato"
+    _attr_icon = "mdi:map-marker-star"
+
+    def __init__(self, coordinator: FuelPricesItalyCoordinator, entry: ConfigEntry) -> None:
+        """Initialize the entity."""
+        super().__init__(coordinator, entry)
+        self._attr_unique_id = f"{entry.entry_id}_recommended_station"
+
+    @property
+    def native_value(self) -> str | None:
+        """Return the recommended station name."""
+        recommendation = self._recommendation
+        return recommendation[0].display_name if recommendation else None
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return recommendation details."""
+        recommendation = self._recommendation
+        if not recommendation:
+            return {}
+
+        station, fuel, score = recommendation
+        return _station_attrs(station) | {
+            "fuel_id": fuel.fuel_id,
+            "fuel_name": fuel.name,
+            "is_self": fuel.is_self,
+            "price_eur_l": round(fuel.price, 3),
+            "price_display": f"{fuel.price:.3f} EUR/L",
+            "convenience_score": round(score, 3),
+            "score_formula": "price_eur_l + distance_km * 0.03",
+        }
+
+    @property
+    def _recommendation(self) -> tuple[Station, Any, float] | None:
+        stations = list((self.coordinator.data or {}).values())
+        if not stations or not self.coordinator.selected_fuel_types:
+            return None
+
+        fuel_id = self.coordinator.selected_fuel_types[0]
+        best: tuple[Station, Any, float] | None = None
+        for station in stations:
+            for fuel in self.coordinator.visible_fuels(station):
+                if fuel.fuel_id != fuel_id:
+                    continue
+                score = fuel.price + station.distance_km * 0.03
+                if best is None or score < best[2]:
+                    best = (station, fuel, score)
+        return best
+
+
 def _station_attrs(station: Station) -> dict[str, Any]:
     return {
         ATTR_STATION_ID: station.id,
-        ATTR_STATION_NAME: station.name,
+        ATTR_STATION_NAME: station.display_name,
         ATTR_BRAND: station.brand,
         ATTR_DISTANCE_KM: round(station.distance_km, 3),
         ATTR_INSERT_DATE: station.insert_date,

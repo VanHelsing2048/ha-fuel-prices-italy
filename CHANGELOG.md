@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file.
 
 This project follows semantic versioning once published with GitHub releases.
 
+## 0.1.3 - 2026-07-02
+
+### Added
+
+- Added a recommended station sensor that balances price and distance for the first configured fuel type.
+- Added best-price attributes to station map markers.
+
+### Fixed
+
+- Improved station display names when MIMIT returns only a numeric station name.
+- Exposed fuel prices with three decimal places in attributes and sensor values.
+
 ## 0.1.2 - 2026-07-02
 
 ### Fixed

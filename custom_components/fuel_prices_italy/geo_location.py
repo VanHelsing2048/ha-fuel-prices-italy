@@ -68,7 +68,7 @@ class FuelStationGeoLocation(
     @property
     def name(self) -> str:
         """Return the station name."""
-        return self._station.name
+        return self._station.display_name
 
     @property
     def latitude(self) -> float:
@@ -89,11 +89,17 @@ class FuelStationGeoLocation(
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return station attributes."""
         station = self._station
+        visible_fuels = self.coordinator.visible_fuels(station)
+        best_fuel = min(visible_fuels, key=lambda fuel: fuel.price) if visible_fuels else None
         return {
+            "station_name": station.display_name,
             ATTR_BRAND: station.brand,
             ATTR_DISTANCE_KM: round(station.distance_km, 3),
             ATTR_INSERT_DATE: station.insert_date,
-            ATTR_FUELS: [fuel.as_dict() for fuel in self.coordinator.visible_fuels(station)],
+            "best_price_eur_l": round(best_fuel.price, 3) if best_fuel else None,
+            "best_price_display": f"{best_fuel.price:.3f} EUR/L" if best_fuel else None,
+            "best_price_fuel": best_fuel.name if best_fuel else None,
+            ATTR_FUELS: [fuel.as_dict() for fuel in visible_fuels],
         }
 
     @property

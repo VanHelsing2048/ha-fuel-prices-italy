@@ -116,6 +116,7 @@ The integration creates best-price sensors such as:
 - `sensor.fuel_prices_italy_gpl_migliore`
 - `sensor.fuel_prices_italy_distributori_trovati`
 - `sensor.fuel_prices_italy_distributore_piu_vicino`
+- `sensor.fuel_prices_italy_distributore_consigliato`
 
 Best-price sensors expose useful attributes:
 
@@ -127,6 +128,13 @@ Best-price sensors expose useful attributes:
 - fuel id
 - fuel name
 - self-service flag
+- display price with three decimal places
+
+The recommended-station sensor balances price and distance for the first configured fuel type using:
+
+```text
+price_eur_l + distance_km * 0.03
+```
 
 ### Map Markers
 
